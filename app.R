@@ -111,4 +111,3 @@ server <- function(input, output, session) {
 
 # Shiny app
 shiny::shinyApp(ui, server)
-

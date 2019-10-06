@@ -1,2 +1,2 @@
 # Shinyapp
-Shiny app using custom package
+Shiny app using apikolada package

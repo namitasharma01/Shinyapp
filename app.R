@@ -1,5 +1,6 @@
 # Install dependent package apikolada from github to run the shiny app
-devtools::install_github("https://github.com/namitasharma01/R-Programming-Lab/apikolada", upgrade = "always")
+
+devtools::install_github("namitasharma01/R-Programming-Lab/apikolada", upgrade = "always")
 library("apikolada")
 
 # class object of type api.kolada to interface with the API
@@ -61,7 +62,7 @@ server <- function(input, output, session) {
                       choices = obj.kolada$get.kpi.member(kpigroup = input$kpigroup)$member_title)
   })
   
-  # Refresh output table only when user clicks on update button
+  # Refresh output table and plot only when user clicks on update button
   muni.kpi.df <- eventReactive(input$update, {
     obj.kolada$get.muni.kpi(kpigroup = input$kpigroup, 
                             muni     = input$municipality, 
@@ -69,22 +70,9 @@ server <- function(input, output, session) {
                             gender   = input$gender)
   }, ignoreNULL = FALSE)
   
-  # Refresh plot only when user clicks on update button
-  muni.kpi.plot <- eventReactive(input$update, {
-    obj.kolada$plot.muni.kpi(kpigroup = input$kpigroup, 
-                            muni     = input$municipality, 
-                            kpi      = input$kpi,
-                            gender   = input$gender)
-  }, ignoreNULL = FALSE)
-  
-  # Reactive text for the plot heading and x-axis based on KPI input
+  # Reactive text for the plot heading and y-axis based on KPI input
   plot.label <- eventReactive(input$update, {
     input$kpi
-  })
-  
-  # Output KPI data as a table
-  output$view <- renderTable({ 
-    head(muni.kpi.df(), n = isolate(input$no.obs))
   })
   
   # Plot title
@@ -92,23 +80,30 @@ server <- function(input, output, session) {
     if (!is.null(muni.kpi.df())) {
       plot.label()
     } else {
-      "Sorry! Data not available for the requested input from API"
+      muni.kpi.df() #"Sorry! Data not available for the requested input from API"
     }
   })
   
   # Output KPI plot data
   output$plotkpi <- renderPlot({
-    if (!is.null(muni.kpi.df())) {
-      muni.kpi.plot()
+    if (!is.null(muni.kpi.df())) {    
+      obj.kolada$plot.muni.kpi(period_val = muni.kpi.df()$period, 
+                               kpi_val    = muni.kpi.df()$value, 
+                               kpi_label  = plot.label())
     }
+  })
+  
+  # Output KPI data as a table
+  output$view <- renderTable({ 
+    head(muni.kpi.df(), n = isolate(input$no.obs))
   })
   
   # KPI summary
   output$summary <- renderPrint({
     if (!is.null(muni.kpi.df())) {    
-      summary(muni.kpi.df())
+      obj.kolada$summary(muni.kpi.df())
     } else {
-      "Sorry! Data not available for the requested input from API"
+      muni.kpi.df() #"Sorry! Data not available for the requested input from API"
     }
   })    
 }

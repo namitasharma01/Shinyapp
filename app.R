@@ -1,3 +1,4 @@
+library("apikolada")
 
 # class object of type api.kolada to interface with the API
 obj.kolada <- apikolada::api.kolada()
@@ -58,9 +59,17 @@ server <- function(input, output, session) {
                       choices = obj.kolada$get.kpi.member(kpigroup = input$kpigroup)$member_title)
   })
   
-  # Refresh output table and plot only when user clicks on update button
+  # Refresh output table only when user clicks on update button
   muni.kpi.df <- eventReactive(input$update, {
     obj.kolada$get.muni.kpi(kpigroup = input$kpigroup, 
+                            muni     = input$municipality, 
+                            kpi      = input$kpi,
+                            gender   = input$gender)
+  }, ignoreNULL = FALSE)
+  
+  # Refresh plot only when user clicks on update button
+  muni.kpi.plot <- eventReactive(input$update, {
+    obj.kolada$plot.muni.kpi(kpigroup = input$kpigroup, 
                             muni     = input$municipality, 
                             kpi      = input$kpi,
                             gender   = input$gender)
@@ -88,14 +97,7 @@ server <- function(input, output, session) {
   # Output KPI plot data
   output$plotkpi <- renderPlot({
     if (!is.null(muni.kpi.df())) {
-      plot(x    = muni.kpi.df()$period, 
-           y    = muni.kpi.df()$value,
-           xlab = "Period (in years)",
-           ylab = plot.label()) + 
-        scatter.smooth(x    = muni.kpi.df()$period, 
-                       y    = muni.kpi.df()$value,
-                       xlab = "Period (in years)",
-                       ylab = plot.label())
+      muni.kpi.plot()
     }
   })
   

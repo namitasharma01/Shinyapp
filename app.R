@@ -1,6 +1,5 @@
 # Install dependent package apikolada from github to run the shiny app
-
-devtools::install_github("namitasharma01/R-Programming-Lab/apikolada", upgrade = "always")
+# devtools::install_github("namitasharma01/R-Programming-Lab/apikolada", upgrade = "always")
 library("apikolada")
 
 # class object of type api.kolada to interface with the API

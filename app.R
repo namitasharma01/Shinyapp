@@ -76,20 +76,14 @@ server <- function(input, output, session) {
   
   # Plot title
   output$plottitle <- renderText({
-    if (!is.null(muni.kpi.df())) {
-      plot.label()
-    } else {
-      muni.kpi.df() #"Sorry! Data not available for the requested input from API"
-    }
+    plot.label()
   })
   
   # Output KPI plot data
   output$plotkpi <- renderPlot({
-    if (!is.null(muni.kpi.df())) {    
-      obj.kolada$plot.muni.kpi(period_val = muni.kpi.df()$period, 
-                               kpi_val    = muni.kpi.df()$value, 
-                               kpi_label  = plot.label())
-    }
+    obj.kolada$plot.muni.kpi(period_val = muni.kpi.df()$period, 
+                             kpi_val    = muni.kpi.df()$value, 
+                             kpi_label  = plot.label())
   })
   
   # Output KPI data as a table
@@ -99,11 +93,7 @@ server <- function(input, output, session) {
   
   # KPI summary
   output$summary <- renderPrint({
-    if (!is.null(muni.kpi.df())) {    
-      obj.kolada$summary(muni.kpi.df())
-    } else {
-      muni.kpi.df() #"Sorry! Data not available for the requested input from API"
-    }
+    obj.kolada$summary.kpi(muni.kpi.df())
   })    
 }
 
